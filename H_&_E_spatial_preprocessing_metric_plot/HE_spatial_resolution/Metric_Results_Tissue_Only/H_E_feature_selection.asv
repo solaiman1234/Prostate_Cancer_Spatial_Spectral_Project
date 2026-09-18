@@ -1,0 +1,123 @@
+clc
+
+
+
+%% =========================================================
+% H&E CANCER vs NON-CANCER
+% FEATURE COMPARISON ACROSS SPATIAL RESOLUTION
+%
+% Each feature:
+% Column 1 = filename
+% Column 2 = 1024
+% Column 3 = 512
+% Column 4 = 256
+% Column 5 = 128
+% Column 6 = 64
+%
+% Do NOT use "clear" because feature variables should
+% already exist in the MATLAB workspace.
+%% =========================================================
+
+clc;
+close all;
+clearvars -except EdgeDice_data EntropyRetention_data GLCMHomogeneity_data GradientRetention_data HFRetention_data LaplacianRetention_data SSIM_data GLCMContrast_data 
+
+%% =========================================================
+% STEP 1
+% EXCEL FILES
+%% =========================================================
+
+nonCancerFile = ...
+'D:\Prostate Cancer Assignment\master_sheet_annotation_only_non_cancer.xlsx';
+
+cancerFile = ...
+'D:\Prostate Cancer Assignment\master_sheet_annotation_only_cancer.xlsx';
+
+
+%% =========================================================
+% STEP 2
+% SPATIAL RESOLUTIONS
+%% =========================================================
+
+resolutions = [1024 512 256 128 64];
+
+
+%% =========================================================
+% STEP 3
+% DEFINE 8 FEATURES
+%% =========================================================
+
+featureData = { ...
+    SSIM_data, ...
+    EdgeDice_data, ...
+    GradientRetention_data, ...
+    LaplacianRetention_data, ...
+    HFRetention_data, ...
+    GLCMContrast_data, ...
+    GLCMHomogeneity_data, ...
+    EntropyRetention_data};
+
+
+featureNames = { ...
+    'SSIM', ...
+    'Edge Dice', ...
+    'Gradient Retention', ...
+    'Laplacian Retention', ...
+    'High-Frequency Retention', ...
+    'GLCM Contrast', ...
+    'GLCM Homogeneity', ...
+    'Entropy Retention'};
+
+
+%% =========================================================
+% STEP 4
+% READ CANCER / NON-CANCER EXCEL FILES
+%% =========================================================
+
+%cancerTable = readtable( ...
+%    cancerFile, ...
+%    'VariableNamingRule','preserve');
+
+
+%nonCancerTable = readtable( ...
+%    nonCancerFile, ...
+%    'VariableNamingRule','preserve');
+
+[~,~,nonCancerTable] = xlsread(nonCancerFile);
+[~,~,cancerTable]    = xlsread(cancerFile);
+
+nonCancerNames = string(nonCancerTable(2:end,1));
+cancerNames    = string(cancerTable(2:end,1));
+
+fileNames=EdgeDice_data(:,1);
+G_names = erase(fileNames, ".png");
+G_names=string(G_names);
+
+
+%% Find corresponding rows
+nonCancerIndex = ismember(G_names, nonCancerNames);
+cancerIndex    = ismember(G_names, cancerNames);
+
+fprintf('Number of non-cancer files found = %d\n', ...
+    sum(nonCancerIndex));
+
+fprintf('Number of cancer files found = %d\n', ...
+    sum(cancerIndex));
+
+
+%% =========================================================
+% STEP 5
+% FIND FILENAME COLUMN AUTOMATICALLY
+%
+% Search column names containing:
+% file
+% filename
+% name
+%
+% If none are found, use first column.
+%% =========================================================
+
+SSIM_nonCancer = EdgeDice_data(nonCancerIndex,2:6);
+SSIM_cancer    = EdgeDice_data(CancerIndex,2:6);
+
+
